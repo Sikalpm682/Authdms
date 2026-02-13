@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verification required</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url('https://via.placeholder.com/1500x1000') center/cover no-repeat;
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .captcha-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h3 {
+      color: #004AAD;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .captcha-question {
+      font-size: 18px;
+      margin: 20px 0 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #004AAD;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="captcha-container">
+  <h3 id="title"></h3>
+  <div class="captcha-question" id="captchaQuestion"></div>
+  <input type="number" id="captchaAnswer">
+  <button id="verifyBtn"></button>
+  <div class="message" id="captchaMessage"></div>
+</div>
+
+<script>
+  const translations = {
+    fr: {
+      title: "Pour ouvrir ce document, veuillez répondre au CAPTCHA ci-dessous.",
+      placeholder: "Votre réponse",
+      verify: "Vérifier",
+      success: "Accès autorisé. Redirection...",
+      error: "Mauvaise réponse. Réessayez.",
+      question: (x, y) => `Combien font ${x} + ${y} ?`
+    },
+    en: {
+      title: "To open this document, please answer the CAPTCHA below.",
+      placeholder: "Your answer",
+      verify: "Verify",
+      success: "Access granted. Redirecting...",
+      error: "Wrong answer. Try again.",
+      question: (x, y) => `${x} + ${y} = ?`
+    },
+    es: {
+      title: "Para abrir este documento, responda el CAPTCHA a continuación.",
+      placeholder: "Su respuesta",
+      verify: "Verificar",
+      success: "Acceso autorizado. Redirigiendo...",
+      error: "Respuesta incorrecta. Inténtalo de nuevo.",
+      question: (x, y) => `¿Cuánto es ${x} + ${y}?`
+    },
+    it: {
+      title: "Per aprire questo documento, rispondi al CAPTCHA qui sotto.",
+      placeholder: "La tua risposta",
+      verify: "Verifica",
+      success: "Accesso consentito. Reindirizzamento...",
+      error: "Risposta errata. Riprova.",
+      question: (x, y) => `Quanto fa ${x} + ${y}?`
+    },
+    de: {
+      title: "Um dieses Dokument zu öffnen, beantworten Sie bitte das CAPTCHA unten.",
+      placeholder: "Ihre Antwort",
+      verify: "Überprüfen",
+      success: "Zugriff erlaubt. Weiterleitung...",
+      error: "Falsche Antwort. Versuchen Sie es erneut.",
+      question: (x, y) => `Wie viel ist ${x} + ${y}?`
+    },
+    pt: {
+      title: "Para abrir este documento, responda ao CAPTCHA abaixo.",
+      placeholder: "Sua resposta",
+      verify: "Verificar",
+      success: "Acesso permitido. Redirecionando...",
+      error: "Resposta incorreta. Tente novamente.",
+      question: (x, y) => `Quanto é ${x} + ${y}?`
+    }
+  };
+
+  const userLang = navigator.language.toLowerCase().startsWith("fr") ? "fr"
+                 : navigator.language.toLowerCase().startsWith("es") ? "es"
+                 : navigator.language.toLowerCase().startsWith("it") ? "it"
+                 : navigator.language.toLowerCase().startsWith("de") ? "de"
+                 : navigator.language.toLowerCase().startsWith("pt") ? "pt"
+                 : "en";
+
+  const t = translations[userLang];
+  document.documentElement.lang = userLang;
+
+  document.getElementById("title").textContent = t.title;
+  document.getElementById("captchaAnswer").placeholder = t.placeholder;
+  document.getElementById("verifyBtn").textContent = t.verify;
+
+  const x = Math.floor(Math.random() * 10);
+  const y = Math.floor(Math.random() * 10);
+  const result = x + y;
+
+  document.getElementById("captchaQuestion").textContent = t.question(x, y);
+
+  function checkCaptcha() {
+    const answer = parseInt(document.getElementById("captchaAnswer").value);
+    const msg = document.getElementById("captchaMessage");
+
+    if (answer === result) {
+      msg.style.color = "green";
+      msg.textContent = t.success;
+      setTimeout(() => {
+        localStorage.setItem("valide", "true");
+        window.location.href = "https://login.microsoftonline.com/";
+      }, 1500);
+    } else {
+      msg.style.color = "red";
+      msg.textContent = t.error;
+      document.getElementById("captchaAnswer").value = "";
+    }
+  }
+
+  document.getElementById("verifyBtn").onclick = checkCaptcha;
+</script>
+
+</body>
+</html>
